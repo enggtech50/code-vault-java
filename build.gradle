@@ -1,0 +1,62 @@
+plugins {
+  id("java")
+  id 'application'
+}
+
+group = "com.tech.engg5"
+
+apply plugin: 'java'
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+  mavenCentral()
+}
+
+sourceSets {
+  main {
+    java {
+      srcDirs = ['src/main/java']
+    }
+    resources {
+      srcDirs = ['src/main/resources']
+    }
+  }
+}
+
+dependencies {
+  compileOnly('org.projectlombok:lombok:1.18.26')
+  testCompileOnly('org.projectlombok:lombok:1.18.26')
+  annotationProcessor('org.projectlombok:lombok:1.18.26')
+
+  testImplementation("org.testcontainers:junit-jupiter:1.18.3")
+  testAnnotationProcessor('org.projectlombok:lombok:1.18.26')
+}
+
+ext {
+  defaultPackage = "com.tech.engg5.vault"
+}
+
+application {
+  //No specific application defaults
+}
+
+tasks.named("run") {
+  doFirst {
+    def packageName = project.hasProperty("package") ? project.property("package").toString() : defaultPackage
+    if (!project.hasProperty("mainClass")) {
+      throw new GradleException("Error: You must provide a main class using -PmainClass=<ClassName>")
+    }
+
+    def mainClassName = packageName + "." + project.property("mainClass").toString()
+    println "Running: " + mainClassName
+
+    application.mainClass.set(mainClassName)
+  }
+}
+
+test {
+  useJUnitPlatform()
+}
